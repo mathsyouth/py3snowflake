@@ -1,45 +1,47 @@
-pysnowflake
-===========
+## py3snowflake
 
-pysnowflake is a Python implementation of Twitter's snowflake service - https://github.com/twitter/snowflake
+pysnowflake is a Python implementation of [Twitter's snowflake service](https://github.com/twitter/snowflake).
 
-This is based on the pysnowflak python trift service that Erans did - https://github.com/erans/pysnowflake
-
-Our use case wasn't thrift oriented but HTTP based, so this is a service that runs under the 
-Tornado web framework.  Which makes it possible to only have one depenancy (tornado).
-
-Due to various reasons this implementation does not reach the performance indicated in the original 
-Snowflake implementation, however it is good enough in most cases and can be combined with the 
-help of a software load balancer such as HAProxy to run multiple processes to get higher performance.
-
-Installation
-------------
-
-* Install Tornado
-* Run the service
-
-Usage
------
-usage: pysnowflake.py [--debug] [--port=9000] [--datacenter=DC_ID] [--worker=WORKER_ID]
-
-Python based Snowflake server over HTTP
+This is a fork of [pysnowflake Python HTTP service](https://github.com/koblas/pysnowflake) which was based on Thrift service that [Erans did](https://github.com/erans/pysnowflake). Thanks to easy use of [thriftpy2](https://github.com/Thriftpy/thriftpy2) and [gunicorn_thrift](https://github.com/Thriftpy/gunicorn_thrift), py3snowflake is now based on thrift servive again.
 
 
-See the original snowflake server docs for a detailed description, but the bottom line is
-unique numbers will insure unique identifers generated.
-  WORKER_ID is the identifier for this process 
-  DATACENTER_ID is the identifier for this datacenter
+### Supported Platforms
 
-API (aka URLs):
-----
-
-    /id/<USERAGENT>    -- get a unique ID, <USERAGENT> is provided for metrics purposes
-    /timestamp/        -- get the current timestamp for this host
-    /datacenter/       -- get the data center identifier for this process
-    /worker/           -- get the data center identifier for this process
+* Python 3.4+
 
 
-Issues
-------
+### Installation
 
-Please report any issues via [github issues](https://github.com/koblas/pysnowflake/issues)
+* Install [thriftpy2](https://github.com/Thriftpy/thriftpy2): `pip install thriftpy2`
+* Install [gunicorn_thrift](https://github.com/Thriftpy/gunicorn_thrift): `pip install gunicorn_thift`
+
+
+### Usage
+
+Start Snowflake server service:
+```shell
+gunicorn_thrift snowflake_server:app -k thriftpy_sync \
+-b 127.0.0.1:6000 -w 4 --threads 4 \
+--thrift-protocol-factory \
+  thriftpy2.protocol:TCyBinaryProtocolFactory \
+--thrift-transport-factory \
+  thriftpy2.transport:TCyBufferedTransportFactory
+```
+
+Run Snowflake client:
+```
+python snowflake_client.py
+```
+or run the test:
+```
+python test.py
+```
+
+
+### API
+
+`get_id(<USERAGENT>)`: get a unique ID, <USERAGENT> is provided for metrics purposes
+`get_timestamp()`: get the current timestamp for this host
+`get_datacenter_id()`: get the data center identifier for this process
+`get_worker_id()`: get the data center identifier for this process
+
