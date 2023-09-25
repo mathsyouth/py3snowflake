@@ -6,7 +6,7 @@
 #
 --index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
-gevent==1.4.0             # via gunicorn-thrift
+gevent==23.9.1             # via gunicorn-thrift
 greenlet==0.4.16          # via gevent
 gunicorn-thrift==0.2.25   # via py3snowflake (setup.py)
 gunicorn==19.9.0          # via gunicorn-thrift
